@@ -20,9 +20,11 @@
 #### JWKS
 
 ```java
+import com.github.torleifg.maskinporten.MaskinportenClient;
+
 public class Application {
     public static void main(String[] args) {
-        var client = MaskinportenJwksClient.builder()
+        final MaskinportenClient client = MaskinportenJwksClient.builder()
                 .wellKnown("https://ver2.maskinporten.no/")
                 .clientId(clientId)
                 .jwks(jwks)
@@ -40,9 +42,11 @@ public class Application {
 #### X509
 
 ```java
+import com.github.torleifg.maskinporten.MaskinportenClient;
+
 public class Application {
     public static void main(String[] args) {
-        client = MaskinportenX509Client.builder()
+        final MaskinportenClient client = MaskinportenX509Client.builder()
                 .wellKnown("https://ver2.maskinporten.no/")
                 .clientId(clientId)
                 .certificate(x509Certificate)
