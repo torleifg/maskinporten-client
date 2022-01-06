@@ -50,7 +50,7 @@ public class Application {
                 .cache(false)
                 .build();
 
-        var token = client.getAccessToken("<scope>");
+        var token = client.getAccessToken(scope);
 
         System.out.println(token);
     }
