@@ -7,6 +7,10 @@
 
 ### Installation
 
+Clone repository and install artifact in Maven local repository.
+
+### Usage
+
 ```
 <dependency>
   <groupId>com.github.torleifg</groupId>
@@ -14,8 +18,6 @@
   <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
-
-### Usage
 
 #### JWKS
 
