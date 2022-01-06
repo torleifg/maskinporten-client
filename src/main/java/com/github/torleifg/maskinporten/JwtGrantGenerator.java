@@ -53,14 +53,14 @@ class JwtGrantGenerator {
 
     public static String createJwtGrant(String audience, String issuer, X509Certificate certificate, PrivateKey key, String... scopes) {
         try {
-            List<Base64> certChain = new ArrayList<>();
+            var certChain = new ArrayList<Base64>();
             certChain.add(Base64.encode(certificate.getEncoded()));
 
-            JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+            var header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                     .x509CertChain(certChain)
                     .build();
 
-            JWTClaimsSet claimSet = new JWTClaimsSet.Builder()
+            var claimSet = new JWTClaimsSet.Builder()
                     .audience(audience)
                     .issuer(issuer)
                     .claim("scope", String.join(" ", scopes))
@@ -69,8 +69,8 @@ class JwtGrantGenerator {
                     .expirationTime(new Date(Clock.systemUTC().millis() + 120000))
                     .build();
 
-            JWSSigner signer = new RSASSASigner(key);
-            SignedJWT jwt = new SignedJWT(header, claimSet);
+            var signer = new RSASSASigner(key);
+            var jwt = new SignedJWT(header, claimSet);
             jwt.sign(signer);
 
             return jwt.serialize();
