@@ -11,6 +11,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map;
 
 class MaskinportenGateway {
@@ -18,7 +19,10 @@ class MaskinportenGateway {
     private final Gson gson;
 
     public MaskinportenGateway() {
-        this.client = HttpClient.newHttpClient();
+        this.client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(2))
+                .build();
+
         this.gson = new GsonBuilder()
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
@@ -33,6 +37,7 @@ class MaskinportenGateway {
         var request = HttpRequest.newBuilder()
                 .POST(createForm(data))
                 .uri(tokenEndpoint)
+                .timeout(Duration.ofSeconds(30))
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .build();
 

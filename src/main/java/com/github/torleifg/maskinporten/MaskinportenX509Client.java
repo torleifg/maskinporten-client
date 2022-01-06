@@ -1,18 +1,11 @@
 package com.github.torleifg.maskinporten;
 
-import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
-
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 public class MaskinportenX509Client extends MaskinportenClient {
-    AuthorizationServerMetadata metadata;
-    String clientId;
-    X509Certificate certificate;
-    PrivateKey key;
-    boolean cache;
-
-    final MaskinportenGateway gateway = new MaskinportenGateway();
+    protected X509Certificate certificate;
+    protected PrivateKey key;
 
     private MaskinportenX509Client() {
     }

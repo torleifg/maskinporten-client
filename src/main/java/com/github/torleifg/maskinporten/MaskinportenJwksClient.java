@@ -1,15 +1,8 @@
 package com.github.torleifg.maskinporten;
 
-import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
-
 public class MaskinportenJwksClient extends MaskinportenClient {
-    AuthorizationServerMetadata metadata;
-    String clientId;
-    String jwks;
-    String kid;
-    boolean cache;
-
-    final MaskinportenGateway gateway = new MaskinportenGateway();
+    protected String jwks;
+    protected String kid;
 
     private MaskinportenJwksClient() {
     }

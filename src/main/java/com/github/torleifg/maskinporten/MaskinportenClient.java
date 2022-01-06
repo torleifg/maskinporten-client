@@ -7,6 +7,11 @@ import com.nimbusds.oauth2.sdk.id.Issuer;
 import java.io.IOException;
 
 public abstract class MaskinportenClient {
+    protected AuthorizationServerMetadata metadata;
+    protected String clientId;
+    protected boolean cache;
+
+    protected final MaskinportenGateway gateway = new MaskinportenGateway();
 
     public abstract String getAccessToken(String... scopes);
 
