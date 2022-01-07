@@ -19,7 +19,7 @@ public abstract class MaskinportenClient {
     protected AuthorizationServerMetadata metadata;
     protected JWSHeader header;
 
-    protected final MaskinportenGateway gateway = new MaskinportenGateway();
+    protected static final MaskinportenGateway GATEWAY = new MaskinportenGateway();
 
     public abstract String getAccessToken(String... scopes);
 

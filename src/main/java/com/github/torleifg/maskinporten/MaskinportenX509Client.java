@@ -31,7 +31,7 @@ public class MaskinportenX509Client extends MaskinportenClient {
         try {
             jwt.sign(new RSASSASigner(key));
 
-            return gateway.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
+            return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
         } catch (JOSEException e) {
             throw new MaskinportenClientException(e.getMessage(), e);
         }
