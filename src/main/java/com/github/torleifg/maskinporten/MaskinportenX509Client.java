@@ -1,16 +1,16 @@
 package com.github.torleifg.maskinporten;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.util.Base64;
-import com.nimbusds.jwt.SignedJWT;
 
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 public class MaskinportenX509Client extends MaskinportenClient {
     protected X509Certificate certificate;
@@ -21,20 +21,6 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
     public static Client builder() {
         return new Builder();
-    }
-
-    @Override
-    public String getAccessToken(String... scopes) {
-        var claimsSet = createJWTClaimsSet(metadata.getIssuer().getValue(), clientId, scopes);
-        var jwt = new SignedJWT(header, claimsSet);
-
-        try {
-            jwt.sign(signer);
-
-            return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
-        } catch (JOSEException e) {
-            throw new MaskinportenClientException(e.getMessage(), e);
-        }
     }
 
     public interface Client {
@@ -66,24 +52,28 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
         @Override
         public WellKnown wellKnown(String wellKnown) {
+            requireNonNull(wellKnown,  "wellKnown must not be null");
             client.wellKnown = wellKnown;
             return this;
         }
 
         @Override
         public ClientId clientId(String clientId) {
+            requireNonNull(clientId,  "clientId must not be null");
             client.clientId = clientId;
             return this;
         }
 
         @Override
         public Certificate certificate(X509Certificate certificate) {
+            requireNonNull(certificate,  "certificate must not be null");
             client.certificate = certificate;
             return this;
         }
 
         @Override
         public Key key(PrivateKey key) {
+            requireNonNull(key,  "key must not be null");
             client.key = key;
             return this;
         }

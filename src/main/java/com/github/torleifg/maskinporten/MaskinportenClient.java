@@ -1,8 +1,10 @@
 package com.github.torleifg.maskinporten;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.GeneralException;
 import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
 import com.nimbusds.oauth2.sdk.id.Issuer;
@@ -23,7 +25,18 @@ public abstract class MaskinportenClient {
 
     protected static final MaskinportenGateway GATEWAY = new MaskinportenGateway();
 
-    public abstract String getAccessToken(String... scopes);
+    public String getAccessToken(String... scopes) {
+        var claimsSet = createJWTClaimsSet(metadata.getIssuer().getValue(), clientId, scopes);
+        var jwt = new SignedJWT(header, claimsSet);
+
+        try {
+            jwt.sign(signer);
+
+            return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
+        } catch (JOSEException e) {
+            throw new MaskinportenClientException(e.getMessage(), e);
+        }
+    }
 
     protected static AuthorizationServerMetadata getMetadata(String wellKnown) {
         try {
@@ -33,7 +46,7 @@ public abstract class MaskinportenClient {
         }
     }
 
-    protected JWTClaimsSet createJWTClaimsSet(String audience, String issuer, String... scopes) {
+    private JWTClaimsSet createJWTClaimsSet(String audience, String issuer, String... scopes) {
         return new JWTClaimsSet.Builder()
                 .audience(audience)
                 .issuer(issuer)

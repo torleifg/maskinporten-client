@@ -6,9 +6,10 @@ import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jwt.SignedJWT;
 
 import java.text.ParseException;
+
+import static java.util.Objects.requireNonNull;
 
 public class MaskinportenJwksClient extends MaskinportenClient {
     protected String jwks;
@@ -21,20 +22,6 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
     public static Client builder() {
         return new Builder();
-    }
-
-    @Override
-    public String getAccessToken(String... scopes) {
-        var claimsSet = createJWTClaimsSet(metadata.getIssuer().getValue(), clientId, scopes);
-        var jwt = new SignedJWT(header, claimsSet);
-
-        try {
-            jwt.sign(signer);
-
-            return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
-        } catch (JOSEException e) {
-            throw new MaskinportenClientException(e.getMessage(), e);
-        }
     }
 
     public interface Client {
@@ -66,24 +53,28 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
         @Override
         public WellKnown wellKnown(String wellKnown) {
+            requireNonNull(wellKnown,  "wellKnown must not be null");
             client.wellKnown = wellKnown;
             return this;
         }
 
         @Override
         public ClientId clientId(String clientId) {
+            requireNonNull(clientId,  "clientId must not be null");
             client.clientId = clientId;
             return this;
         }
 
         @Override
         public Jwks jwks(String jwks) {
+            requireNonNull(jwks,  "jwks must not be null");
             client.jwks = jwks;
             return this;
         }
 
         @Override
         public Kid kid(String kid) {
+            requireNonNull(kid,  "kid must not be null");
             client.kid = kid;
             return this;
         }
