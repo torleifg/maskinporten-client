@@ -14,7 +14,7 @@ public class MaskinportenJwksClient extends MaskinportenClient {
     protected String jwks;
     protected String kid;
 
-    protected static JWK jwk;
+    protected JWK jwk;
 
     private MaskinportenJwksClient() {
     }
@@ -96,17 +96,17 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
         @Override
         public MaskinportenClient build() {
-            metadata = getMetadata(client.wellKnown);
+            client.metadata = getMetadata(client.wellKnown);
 
             try {
                 var jwkSet = JWKSet.parse(client.jwks);
-                jwk = jwkSet.getKeyByKeyId(client.kid);
+                client.jwk = jwkSet.getKeyByKeyId(client.kid);
 
-                if (jwk == null) {
+                if (client.jwk == null) {
                     throw new MaskinportenClientException("Invalid kid. Must match kid in JWKS.");
                 }
 
-                header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                client.header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                         .keyID(client.kid)
                         .build();
 

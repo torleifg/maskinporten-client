@@ -96,12 +96,12 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
         @Override
         public MaskinportenClient build() {
-            metadata = getMetadata(client.wellKnown);
+            client.metadata = getMetadata(client.wellKnown);
 
             try {
                 var certChain = List.of(Base64.encode(client.certificate.getEncoded()));
 
-                header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                client.header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                         .x509CertChain(certChain)
                         .build();
 

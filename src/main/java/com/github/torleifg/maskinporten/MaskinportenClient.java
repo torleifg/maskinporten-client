@@ -16,8 +16,8 @@ public abstract class MaskinportenClient {
     protected String clientId;
     protected boolean cache;
 
-    protected static AuthorizationServerMetadata metadata;
-    protected static JWSHeader header;
+    protected AuthorizationServerMetadata metadata;
+    protected JWSHeader header;
 
     protected final MaskinportenGateway gateway = new MaskinportenGateway();
 
