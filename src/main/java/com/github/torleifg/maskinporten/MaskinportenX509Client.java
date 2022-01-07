@@ -1,7 +1,16 @@
 package com.github.torleifg.maskinporten;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.util.Base64;
+import com.nimbusds.jwt.SignedJWT;
+
 import java.security.PrivateKey;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.List;
 
 public class MaskinportenX509Client extends MaskinportenClient {
     protected X509Certificate certificate;
@@ -16,9 +25,16 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
     @Override
     public String getAccessToken(String... scopes) {
-        var jwtGrant = JwtGrantGenerator.createJwtGrant(metadata.getIssuer().getValue(), clientId, certificate, key, scopes);
+        var claimsSet = createJWTClaimsSet(metadata.getIssuer().getValue(), clientId, scopes);
+        var jwt = new SignedJWT(header, claimsSet);
 
-        return gateway.getAccessToken(jwtGrant, metadata.getTokenEndpointURI());
+        try {
+            jwt.sign(new RSASSASigner(key));
+
+            return gateway.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
+        } catch (JOSEException e) {
+            throw new MaskinportenClientException(e.getMessage(), e);
+        }
     }
 
     public interface Client {
@@ -50,7 +66,7 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
         @Override
         public WellKnown wellKnown(String wellKnown) {
-            client.metadata = getMetadata(wellKnown);
+            client.wellKnown = wellKnown;
             return this;
         }
 
@@ -80,6 +96,19 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
         @Override
         public MaskinportenClient build() {
+            metadata = getMetadata(client.wellKnown);
+
+            try {
+                var certChain = List.of(Base64.encode(client.certificate.getEncoded()));
+
+                header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                        .x509CertChain(certChain)
+                        .build();
+
+            } catch (CertificateEncodingException e) {
+                throw new MaskinportenClientException(e.getMessage(), e);
+            }
+
             return client;
         }
     }

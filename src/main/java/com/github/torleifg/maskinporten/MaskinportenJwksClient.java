@@ -1,8 +1,20 @@
 package com.github.torleifg.maskinporten;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jwt.SignedJWT;
+
+import java.text.ParseException;
+
 public class MaskinportenJwksClient extends MaskinportenClient {
     protected String jwks;
     protected String kid;
+
+    protected static JWK jwk;
 
     private MaskinportenJwksClient() {
     }
@@ -13,9 +25,16 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
     @Override
     public String getAccessToken(String... scopes) {
-        var jwtGrant = JwtGrantGenerator.createJwtGrant(metadata.getIssuer().getValue(), clientId, jwks, kid, scopes);
+        var claimsSet = createJWTClaimsSet(metadata.getIssuer().getValue(), clientId, scopes);
+        var jwt = new SignedJWT(header, claimsSet);
 
-        return gateway.getAccessToken(jwtGrant, metadata.getTokenEndpointURI());
+        try {
+            jwt.sign(new RSASSASigner(jwk.toRSAKey()));
+
+            return gateway.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
+        } catch (JOSEException e) {
+            throw new MaskinportenClientException(e.getMessage(), e);
+        }
     }
 
     public interface Client {
@@ -47,7 +66,7 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
         @Override
         public WellKnown wellKnown(String wellKnown) {
-            client.metadata = getMetadata(wellKnown);
+            client.wellKnown = wellKnown;
             return this;
         }
 
@@ -77,6 +96,24 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
         @Override
         public MaskinportenClient build() {
+            metadata = getMetadata(client.wellKnown);
+
+            try {
+                var jwkSet = JWKSet.parse(client.jwks);
+                jwk = jwkSet.getKeyByKeyId(client.kid);
+
+                if (jwk == null) {
+                    throw new MaskinportenClientException("Invalid kid. Must match kid in JWKS.");
+                }
+
+                header = new JWSHeader.Builder(JWSAlgorithm.RS256)
+                        .keyID(client.kid)
+                        .build();
+
+            } catch (ParseException e) {
+                throw new MaskinportenClientException(e.getMessage(), e);
+            }
+
             return client;
         }
     }
