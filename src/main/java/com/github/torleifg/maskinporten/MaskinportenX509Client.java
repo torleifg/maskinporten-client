@@ -29,7 +29,7 @@ public class MaskinportenX509Client extends MaskinportenClient {
         var jwt = new SignedJWT(header, claimsSet);
 
         try {
-            jwt.sign(new RSASSASigner(key));
+            jwt.sign(signer);
 
             return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
         } catch (JOSEException e) {
@@ -104,6 +104,8 @@ public class MaskinportenX509Client extends MaskinportenClient {
                 client.header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                         .x509CertChain(certChain)
                         .build();
+
+                client.signer = new RSASSASigner(client.key);
 
             } catch (CertificateEncodingException e) {
                 throw new MaskinportenClientException(e.getMessage(), e);

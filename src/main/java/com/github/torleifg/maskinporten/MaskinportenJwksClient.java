@@ -29,7 +29,7 @@ public class MaskinportenJwksClient extends MaskinportenClient {
         var jwt = new SignedJWT(header, claimsSet);
 
         try {
-            jwt.sign(new RSASSASigner(jwk.toRSAKey()));
+            jwt.sign(signer);
 
             return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
         } catch (JOSEException e) {
@@ -110,7 +110,9 @@ public class MaskinportenJwksClient extends MaskinportenClient {
                         .keyID(client.kid)
                         .build();
 
-            } catch (ParseException e) {
+                client.signer = new RSASSASigner(client.jwk.toRSAKey());
+
+            } catch (ParseException | JOSEException e) {
                 throw new MaskinportenClientException(e.getMessage(), e);
             }
 

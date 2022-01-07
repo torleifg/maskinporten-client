@@ -1,6 +1,7 @@
 package com.github.torleifg.maskinporten;
 
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.oauth2.sdk.GeneralException;
 import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
@@ -18,6 +19,7 @@ public abstract class MaskinportenClient {
 
     protected AuthorizationServerMetadata metadata;
     protected JWSHeader header;
+    protected RSASSASigner signer;
 
     protected static final MaskinportenGateway GATEWAY = new MaskinportenGateway();
 
