@@ -31,18 +31,10 @@ class JwtGrantGenerator {
                     .keyID(kid)
                     .build();
 
-            var claimSet = new JWTClaimsSet.Builder()
-                    .audience(audience)
-                    .issuer(issuer)
-                    .claim("scope", String.join(" ", scopes))
-                    .jwtID(UUID.randomUUID().toString())
-                    .issueTime(new Date(Clock.systemUTC().millis()))
-                    .expirationTime(new Date(Clock.systemUTC().millis() + 120000))
-                    .build();
+            var claimSet = getClaimsSet(audience, issuer, scopes);
 
-            var signer = new RSASSASigner(jwk.toRSAKey());
             var jwt = new SignedJWT(header, claimSet);
-            jwt.sign(signer);
+            jwt.sign(new RSASSASigner(jwk.toRSAKey()));
 
             return jwt.serialize();
         } catch (JOSEException | ParseException e) {
@@ -52,29 +44,31 @@ class JwtGrantGenerator {
 
     public static String createJwtGrant(String audience, String issuer, X509Certificate certificate, PrivateKey key, String... scopes) {
         try {
-            var certChain = new ArrayList<Base64>();
-            certChain.add(Base64.encode(certificate.getEncoded()));
+            var certChain = List.of(Base64.encode(certificate.getEncoded()));
 
             var header = new JWSHeader.Builder(JWSAlgorithm.RS256)
                     .x509CertChain(certChain)
                     .build();
 
-            var claimSet = new JWTClaimsSet.Builder()
-                    .audience(audience)
-                    .issuer(issuer)
-                    .claim("scope", String.join(" ", scopes))
-                    .jwtID(UUID.randomUUID().toString())
-                    .issueTime(new Date(Clock.systemUTC().millis()))
-                    .expirationTime(new Date(Clock.systemUTC().millis() + 120000))
-                    .build();
+            var claimSet = getClaimsSet(audience, issuer, scopes);
 
-            var signer = new RSASSASigner(key);
             var jwt = new SignedJWT(header, claimSet);
-            jwt.sign(signer);
+            jwt.sign(new RSASSASigner(key));
 
             return jwt.serialize();
         } catch (JOSEException | CertificateEncodingException e) {
             throw new MaskinportenClientException(e.getMessage(), e);
         }
+    }
+
+    private static JWTClaimsSet getClaimsSet(String audience, String issuer, String... scopes) {
+        return new JWTClaimsSet.Builder()
+                .audience(audience)
+                .issuer(issuer)
+                .claim("scope", String.join(" ", scopes))
+                .jwtID(UUID.randomUUID().toString())
+                .issueTime(new Date(Clock.systemUTC().millis()))
+                .expirationTime(new Date(Clock.systemUTC().millis() + 120000))
+                .build();
     }
 }
