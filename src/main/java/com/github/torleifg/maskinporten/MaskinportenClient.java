@@ -12,6 +12,7 @@ import com.nimbusds.oauth2.sdk.id.Issuer;
 import java.io.IOException;
 import java.time.Clock;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class MaskinportenClient {
@@ -25,14 +26,16 @@ public abstract class MaskinportenClient {
 
     protected static final MaskinportenGateway GATEWAY = new MaskinportenGateway();
 
-    public String getAccessToken(String... scopes) {
+    public Optional<String> getAccessToken(String... scopes) throws MaskinportenClientException {
         var claimsSet = createJWTClaimsSet(metadata.getIssuer().getValue(), clientId, scopes);
         var jwt = new SignedJWT(header, claimsSet);
 
         try {
             jwt.sign(signer);
 
-            return GATEWAY.getAccessToken(jwt.serialize(), metadata.getTokenEndpointURI());
+            return GATEWAY.getJwtGrantResponse(jwt.serialize(), metadata.getTokenEndpointURI())
+                    .map(JwtGrantResponse::getAccessToken);
+
         } catch (JOSEException e) {
             throw new MaskinportenClientException(e.getMessage(), e);
         }

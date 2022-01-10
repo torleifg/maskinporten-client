@@ -34,9 +34,7 @@ public class Application {
                 .cache(false)
                 .build();
 
-        var token = client.getAccessToken(scope);
-
-        System.out.println(token);
+        client.getAccessToken(scope).ifPresent(System.out::println);
     }
 }
 ```
@@ -56,9 +54,7 @@ public class Application {
                 .cache(false)
                 .build();
 
-        var token = client.getAccessToken(scope);
-
-        System.out.println(token);
+        client.getAccessToken(scope).ifPresent(System.out::println);
     }
 }
 ```

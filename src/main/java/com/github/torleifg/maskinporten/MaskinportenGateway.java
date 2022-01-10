@@ -3,6 +3,7 @@ package com.github.torleifg.maskinporten;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -13,10 +14,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 
 class MaskinportenGateway {
-    private final HttpClient client;
-    private final Gson gson;
+    public final HttpClient client;
+    public final Gson gson;
 
     public MaskinportenGateway() {
         this.client = HttpClient.newBuilder()
@@ -28,7 +30,7 @@ class MaskinportenGateway {
                 .create();
     }
 
-    public String getAccessToken(String jwtGrant, URI tokenEndpoint) {
+    public Optional<JwtGrantResponse> getJwtGrantResponse(String jwtGrant, URI tokenEndpoint) {
         var data = Map.of(
                 "grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "assertion", jwtGrant
@@ -45,13 +47,12 @@ class MaskinportenGateway {
             var response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                var token = gson.fromJson(response.body(), JwtGrantResponse.class);
-                return token.getAccessToken();
+                return Optional.ofNullable(gson.fromJson(response.body(), JwtGrantResponse.class));
             }
 
-            throw new MaskinportenClientException(response.body());
+            throw new MaskinportenClientException(String.format("%s %s %s", response.request(), response.statusCode(), response.body()));
 
-        } catch (InterruptedException | IOException e) {
+        } catch (InterruptedException | JsonSyntaxException | IOException e) {
             throw new MaskinportenClientException(e.getMessage(), e);
         }
     }
