@@ -39,7 +39,7 @@ public abstract class MaskinportenClient {
 
     private Optional<String> getCachedAccessToken(String... scopes) {
         var key = String.join(" ", scopes);
-        var accessToken = accessTokens.get(String.join(" ", scopes));
+        var accessToken = accessTokens.get(key);
 
         if (accessToken == null) {
             var jwtGrant = createJwtGrant(scopes);
