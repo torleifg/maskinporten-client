@@ -30,23 +30,21 @@ public abstract class MaskinportenClient {
 
     public Optional<String> getAccessToken(String... scopes) throws MaskinportenClientException {
         if (cache) {
-            return getCacheAccessToken(scopes);
+            return getCachedAccessToken(scopes);
         }
 
         return gateway.getJwtGrantResponse(createJwtGrant(scopes), metadata.getTokenEndpointURI())
                 .map(JwtGrantResponse::getAccessToken);
     }
 
-    private Optional<String> getCacheAccessToken(String... scopes) {
+    private Optional<String> getCachedAccessToken(String... scopes) {
         var key = String.join(" ", scopes);
-
         var accessToken = accessTokens.get(String.join(" ", scopes));
 
         if (accessToken == null) {
             var jwtGrant = createJwtGrant(scopes);
             var token = gateway.getJwtGrantResponse(jwtGrant, metadata.getTokenEndpointURI())
                     .map(JwtGrantResponse::getAccessToken);
-
             token.ifPresent(value -> accessTokens.put(key, value));
 
             return token;
@@ -55,14 +53,12 @@ public abstract class MaskinportenClient {
         try {
             var jwt = JWTParser.parse(accessToken);
             var expiration = jwt.getJWTClaimsSet().getExpirationTime();
-
             var current = new Date(Clock.systemUTC().millis() - 10000);
 
             if (current.compareTo(expiration) >= 0) {
                 var jwtGrant = createJwtGrant(scopes);
                 var token = gateway.getJwtGrantResponse(jwtGrant, metadata.getTokenEndpointURI())
                         .map(JwtGrantResponse::getAccessToken);
-
                 token.ifPresent(value -> accessTokens.put(key, value));
 
                 return token;
