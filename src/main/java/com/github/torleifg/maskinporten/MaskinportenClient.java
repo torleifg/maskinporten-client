@@ -86,7 +86,7 @@ public abstract class MaskinportenClient {
 
     protected static AuthorizationServerMetadata getMetadata(String wellKnown) {
         try {
-            return AuthorizationServerMetadata.resolve(new Issuer(wellKnown));
+            return AuthorizationServerMetadata.resolve(new Issuer(wellKnown), 2000, 30000);
         } catch (GeneralException | IOException e) {
             throw new MaskinportenClientException(e.getMessage(), e);
         }
