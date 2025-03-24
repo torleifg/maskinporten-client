@@ -13,8 +13,8 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 public class MaskinportenX509Client extends MaskinportenClient {
-    protected X509Certificate certificate;
-    protected PrivateKey key;
+    private X509Certificate certificate;
+    private PrivateKey key;
 
     private MaskinportenX509Client() {
     }
@@ -52,28 +52,28 @@ public class MaskinportenX509Client extends MaskinportenClient {
 
         @Override
         public WellKnown wellKnown(String wellKnown) {
-            requireNonNull(wellKnown,  "wellKnown must not be null");
+            requireNonNull(wellKnown, "wellKnown must not be null");
             client.wellKnown = wellKnown;
             return this;
         }
 
         @Override
         public ClientId clientId(String clientId) {
-            requireNonNull(clientId,  "clientId must not be null");
+            requireNonNull(clientId, "clientId must not be null");
             client.clientId = clientId;
             return this;
         }
 
         @Override
         public Certificate certificate(X509Certificate certificate) {
-            requireNonNull(certificate,  "certificate must not be null");
+            requireNonNull(certificate, "certificate must not be null");
             client.certificate = certificate;
             return this;
         }
 
         @Override
         public Key key(PrivateKey key) {
-            requireNonNull(key,  "key must not be null");
+            requireNonNull(key, "key must not be null");
             client.key = key;
             return this;
         }

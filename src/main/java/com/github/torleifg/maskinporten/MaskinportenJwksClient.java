@@ -12,10 +12,10 @@ import java.text.ParseException;
 import static java.util.Objects.requireNonNull;
 
 public class MaskinportenJwksClient extends MaskinportenClient {
-    protected String jwks;
-    protected String kid;
+    private String jwks;
+    private String kid;
 
-    protected JWK jwk;
+    private JWK jwk;
 
     private MaskinportenJwksClient() {
     }
@@ -53,28 +53,28 @@ public class MaskinportenJwksClient extends MaskinportenClient {
 
         @Override
         public WellKnown wellKnown(String wellKnown) {
-            requireNonNull(wellKnown,  "wellKnown must not be null");
+            requireNonNull(wellKnown, "wellKnown must not be null");
             client.wellKnown = wellKnown;
             return this;
         }
 
         @Override
         public ClientId clientId(String clientId) {
-            requireNonNull(clientId,  "clientId must not be null");
+            requireNonNull(clientId, "clientId must not be null");
             client.clientId = clientId;
             return this;
         }
 
         @Override
         public Jwks jwks(String jwks) {
-            requireNonNull(jwks,  "jwks must not be null");
+            requireNonNull(jwks, "jwks must not be null");
             client.jwks = jwks;
             return this;
         }
 
         @Override
         public Kid kid(String kid) {
-            requireNonNull(kid,  "kid must not be null");
+            requireNonNull(kid, "kid must not be null");
             client.kid = kid;
             return this;
         }
