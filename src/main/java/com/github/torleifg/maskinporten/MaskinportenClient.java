@@ -13,7 +13,10 @@ import com.nimbusds.oauth2.sdk.id.Issuer;
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.Clock;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class MaskinportenClient {
@@ -26,6 +29,7 @@ public abstract class MaskinportenClient {
     protected RSASSASigner signer;
 
     private final MaskinportenGateway gateway = new MaskinportenGateway();
+
     private final Map<String, String> accessTokens = new ConcurrentHashMap<>();
 
     public Optional<String> getAccessToken(String... scopes) throws MaskinportenClientException {
@@ -34,7 +38,7 @@ public abstract class MaskinportenClient {
         }
 
         return gateway.getJwtGrantResponse(createJwtGrant(scopes), metadata.getTokenEndpointURI())
-                .map(JwtGrantResponse::getAccessToken);
+                .map(JwtGrantResponse::accessToken);
     }
 
     private Optional<String> getCachedAccessToken(String... scopes) {
@@ -44,7 +48,7 @@ public abstract class MaskinportenClient {
         if (accessToken == null) {
             var jwtGrant = createJwtGrant(scopes);
             var token = gateway.getJwtGrantResponse(jwtGrant, metadata.getTokenEndpointURI())
-                    .map(JwtGrantResponse::getAccessToken);
+                    .map(JwtGrantResponse::accessToken);
             token.ifPresent(value -> accessTokens.put(key, value));
 
             return token;
@@ -58,7 +62,7 @@ public abstract class MaskinportenClient {
             if (current.compareTo(expiration) >= 0) {
                 var jwtGrant = createJwtGrant(scopes);
                 var token = gateway.getJwtGrantResponse(jwtGrant, metadata.getTokenEndpointURI())
-                        .map(JwtGrantResponse::getAccessToken);
+                        .map(JwtGrantResponse::accessToken);
                 token.ifPresent(value -> accessTokens.put(key, value));
 
                 return token;

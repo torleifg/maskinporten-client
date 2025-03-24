@@ -15,7 +15,7 @@ Clone repository and install artifact in Maven local repository.
 <dependency>
   <groupId>com.github.torleifg</groupId>
   <artifactId>maskinporten-client</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -25,12 +25,13 @@ Clone repository and install artifact in Maven local repository.
 import com.github.torleifg.maskinporten.MaskinportenClient;
 
 public class Application {
+    
     public static void main(String[] args) {
         final MaskinportenClient client = MaskinportenJwksClient.builder()
-                .wellKnown("https://ver2.maskinporten.no/")
-                .clientId(clientId)
+                .wellKnown("https://test.maskinporten.no/")
+                .clientId("clientId")
                 .jwks(jwks)
-                .kid(kid)
+                .kid("kid")
                 .cache(false)
                 .build();
 
@@ -45,10 +46,11 @@ public class Application {
 import com.github.torleifg.maskinporten.MaskinportenClient;
 
 public class Application {
+    
     public static void main(String[] args) {
         final MaskinportenClient client = MaskinportenX509Client.builder()
-                .wellKnown("https://ver2.maskinporten.no/")
-                .clientId(clientId)
+                .wellKnown("https://test.maskinporten.no/")
+                .clientId("clientId")
                 .certificate(x509Certificate)
                 .key(privateKey)
                 .cache(false)

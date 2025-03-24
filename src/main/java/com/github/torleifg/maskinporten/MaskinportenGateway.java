@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.Optional;
 
 class MaskinportenGateway {
-    public final HttpClient client;
-    public final Gson gson;
+    private final HttpClient client;
+    private final Gson gson;
 
-    public MaskinportenGateway() {
+    MaskinportenGateway() {
         this.client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(2))
                 .build();
@@ -30,7 +30,7 @@ class MaskinportenGateway {
                 .create();
     }
 
-    public Optional<JwtGrantResponse> getJwtGrantResponse(String jwtGrant, URI tokenEndpoint) {
+    Optional<JwtGrantResponse> getJwtGrantResponse(String jwtGrant, URI tokenEndpoint) {
         var data = Map.of(
                 "grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer",
                 "assertion", jwtGrant
@@ -61,7 +61,7 @@ class MaskinportenGateway {
         var builder = new StringBuilder();
 
         data.forEach((key, value) -> {
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 builder.append("&");
             }
             builder.append(URLEncoder.encode(key, StandardCharsets.UTF_8));
